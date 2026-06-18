@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Weather App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            width: 380px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 195, 255, 0.3), inset 0 0 20px rgba(0, 195, 255, 0.1);
+            border: 1px solid rgba(0, 195, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(0, 195, 255, 0.8), transparent 30%);
+            animation: rotate 6s linear infinite;
+            z-index: -1;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: rgba(20, 20, 30, 0.9);
+            border-radius: 16px;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h2 {
+            color: #00c3ff;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 195, 255, 0.7);
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(10, 10, 20, 0.7);
+            border: 1px solid rgba(0, 195, 255, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #00c3ff;
+            box-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+        }
+
+        input::placeholder {
+            color: #a0a0a0;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #00c3ff 0%, #0077ff 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 119, 255, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover::after {
+            left: 100%;
+        }
+
+        #weather {
+            margin-top: 25px;
+            font-size: 18px;
+            line-height: 1.6;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: RGba(10, 10, 20, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(0, 195, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .weather-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .temp {
+            font-size: 36px;
+            font-weight: 700;
+            color: #00c3ff;
+            text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+            margin: 10px 0;
+        }
+
+        .city {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 18px;
+            text-transform: capitalize;
+            color: #a0a0a0;
+        }
+
+        .details {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 195, 255, 0.2);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #a0a0a0;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #00c3ff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            color: #ff4d4f;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        .temp {
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Luxury Weather</h2>
+
+        <div class="input-group">
+            <input type="text" id="city" placeholder="Enter City Name">
+        </div>
+
+        <button id="getWeatherBtn">Get Weather</button>
+
+        <div id="weather">
+            <div>Enter a city name to get weather</div>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById("getWeatherBtn");
+        const weatherDiv = document.getElementById("weather");
+        const cityInput = document.getElementById("city");
+
+        cityInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                btn.click();
+            }
+        });
+
+        btn.addEventListener("click", async () => {
+            const city = cityInput.value;
+
+            if (city === "") {
+                weatherDiv.innerHTML = `<div class="error">Please enter a city name</div>`;
+                return;
+            }
+
+            weatherDiv.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <div class="loading"></div>
+                    <span>Loading weather data...</span>
+                </div>
+            `;
+
+            try {
+                const apiKey = "da0ab46968484f1bbd485922261806";
+                const url = `https://api.weatherapi.com/v1/current.json?key=da0ab46968484f1bbd485922261806&q=${city}&aqi=yes`;
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.cod === "404") {
+                    weatherDiv.innerHTML = `<div class="error">404 City not found!</div>`;
+                    return;
+                }
+
+                const getWeatherIcon = (condition) => {
+                    const icons = {
+                        'Clear': '☀️',
+                        'Clouds': '☁️',
+                        'Rain': '🌧️',
+                        'Drizzle': '🌦️',
+                        'Thunderstorm': '⛈️',
+                        'Snow': '❄️',
+                        'Mist': '🌫️',
+                        'Fog': '🌫️'
+                    };
+                    return icons[condition] || '🌈';
+                };
+
+                weatherDiv.innerHTML = `
+                    <div class="weather-icon">
+                        ${getWeatherIcon(data.current.condition.text)}
+                    </div>
+
+                    <div class="city">
+                        ${data.location.name}, ${data.location.country}
+                    </div>
+
+                    <div class="temp">
+                        ${Math.round(data.current.temp_c)}°C
+                    </div>
+
+                    <div class="description">
+                        ${data.current.condition.text}
+                    </div>
+
+                    <div class="details">
+                        <div class="detail-item">
+                            <span class="detail-label">Feels Like</span>
+                            <span class="detail-value">
+                               ${Math.round(data.current.feelslike_c)}°C
+                            </span>
+                        </div>
+
+                        <div class="detail-item">
+                            <span class="detail-label">Humidity</span>
+                            <span class="detail-value">
+                               ${data.current.humidity}%
+                            </span>
+                        </div>
+
+                        <div class="detail-item">
+                            <span class="detail-label">Wind</span>
+                            <span class="detail-value">
+                               ${data.current.wind_kph} km/h
+                            </span>
+                        </div>
+                    </div>
+                `;
+
+            } catch (err) {
+                weatherDiv.innerHTML = `<div class="error">Error fetching weather. Try again!</div>`;
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
